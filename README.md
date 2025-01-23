@@ -1,3 +1,10 @@
+## xhs教程相关
+* **Windterm下载地址:** https://github.com/kingToolbox/WindTerm
+* **宝塔面板安装命令:** https://bt.cn/bbs/thread-19376-1-1.html
+* **终端安装依赖的命令:** /www/server/pyporject_evn/examples_venv/bin/python -m pip install -r /www/server/pyporject_evn/examples_venv/requirements.txt
+* **OCworkshop和记忆应用:** 群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限oc创作者入群，见谅
+
+* 
 # QQ群聊机器人
 
 这个项目是一个基于 BotPY 和 Python 的 QQ 群聊机器人，集成了Dify API、记忆处理应用和 Azure 语音合成服务，提供智能对话、记忆总结和语音回复等功能。
