@@ -1,6 +1,6 @@
 # QQ群聊机器人
 
-这个项目是一个基于 BotPY 和 Python 的 QQ 群聊机器人，集成了 OpenConversationWorkshop API、记忆处理应用和 Azure 语音合成服务，提供智能对话、记忆总结和语音回复等功能。
+这个项目是一个基于 BotPY 和 Python 的 QQ 群聊机器人，集成了Dify API、记忆处理应用和 Azure 语音合成服务，提供智能对话、记忆总结和语音回复等功能。
 
 ## 功能
 
