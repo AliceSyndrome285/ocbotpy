@@ -57,7 +57,10 @@
 
 ## Ocworkshop应用和memory应用文件获取
 
+qq群：
+
 ![微信图片_20250123204448](https://github.com/user-attachments/assets/24b3f43b-3fb3-4e3b-bdfa-c8aa800e58ee)
 
 ## 给作者买杯奶茶
+
 ![微信图片_20250123204355](https://github.com/user-attachments/assets/090ede99-669a-4ab4-9e60-5deaf4a95569)
