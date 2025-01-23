@@ -1,5 +1,5 @@
 ## xhs教程相关
-* **Windterm下载地址:**![00106-24717572](https://github.com/user-attachments/assets/4cc5a24e-8578-485f-9e3f-b4fb88759ef5)
+* **Windterm下载地址:** https://github.com/kingToolbox/WindTerm
 * **宝塔面板安装命令:** https://bt.cn/bbs/thread-19376-1-1.html
 * **终端安装依赖的命令:** /www/server/pyporject_evn/examples_venv/bin/python -m pip install -r /www/server/pyporject_evn/examples_venv/requirements.txt
 * **OCworkshop和记忆应用:** 群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限oc创作者入群，见谅
