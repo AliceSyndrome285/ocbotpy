@@ -54,3 +54,14 @@
 ### `emotion_config.yaml`
 
 *   `emotion_mapping`:  一个字典，键为情绪词，值为对应的 base64 图片字符串。
+
+
+## Ocworkshop和记忆处理应用获取
+
+qq群文件
+![微信图片_20250123204448](https://github.com/user-attachments/assets/3f1434b3-d799-41ea-87b3-b2884b12d32e)
+：
+## 给作者买杯奶茶
+![微信图片_20250123204355](https://github.com/user-attachments/assets/863ca9c8-7198-4d40-aef1-b8865a9899ea)
+
+
