@@ -37,7 +37,7 @@
 1.  运行 `python test.py` 启动机器人。
 2.  在 QQ 群中 @机器人，即可与其进行对话。
 3.  在消息中添加 `-v` 可以触发语音回复功能 (需要配置 Azure 语音服务的speech_key和speech_region)。
-4.  在examples文件夹上传自己的表情包，命名格式类似：[高兴].png，并且在Dify-OCworkshop中作相应的提示词要求，机器人即可在回复时输出表情包。
+4.  在examples文件夹上传自己的表情包，命名格式类似：[高兴].png，运行gif2base64.py后，在Dify-OCworkshop中作相应的提示词要求，机器人即可在回复时输出表情包。
 
 ## 配置
 
