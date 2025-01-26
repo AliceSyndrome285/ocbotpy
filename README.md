@@ -1,10 +1,31 @@
 # 更新日志
-20250126：1.更新test.py，调整了记忆应用中总结功能和永久记忆功能的代码，并更新Dify中的记忆应用以适配。2.更新gif2base64.py，将图片转为base64格式并写入emotion_config中，实现根据聊天内容匹配角色表情包
+20250126：
+1.更新test.py，调整了记忆应用中总结功能和永久记忆功能的代码，并更新Dify中的记忆应用以适配。
+2.更新gif2base64.py，将图片转为base64格式并写入emotion_config中，实现根据聊天内容匹配角色表情包
 
 # 使用方法
 在code中下载压缩包，解压后的ocbotpy文件夹就是xhs教程中所需的文件夹
 
 # xhs教程相关（账号：末期少女病）
+* **教程更正＆补充:** ：
+* 
+  1.更正：14分48秒，app_url和memory_url的开头不要改成https，http就行，config.yaml里面的所有url地址开头都是http
+
+  2.补充：在亚马逊服务器中务必配置好下面的端口，并设置好IP限制：
+  •    22 端口：应用程序 SSH, 协议 TCP, 端口号 22
+  •    80 端口：应用程序 HTTP, 协议 TCP, 端口号 80
+  •    443 端口：应用程序 HTTPS, 协议 TCP, 端口号 443
+  •    8888 端口：应用程序自定义, 协议 TCP, 端口号 8888
+  •    xxxxx 端口：应用程序自定义, 协议 TCP, 端口号 xxxxx (此端口号在宝塔面板安装完成后生成，请根据实际情况填写)
+
+  3.补充：在获得了memory和OCworkshop的url和api之后，去Dify首页-知识库中创建知识库-添加一个空txt文件-自动分段与清洗，等待文件处理完成，
+  然后在记事本中补充：
+  dataset_base_url: http://(你的服务器IP):8888 
+  dataset_api_key:  (你的知识库apikey)
+  在Dify首页-知识库-左侧的api选项卡中，获得知识库apikey
+
+  4.在OCworkshop应用-OC会话（引用记忆变量）节点，提示词中的<你扮演的角色信息>就是填角色设定的地方，各位同学可以自行摸索提示词的写法，这个工作流能达到的效果上限很高，大家不一定按我的模板。
+  
 * **Windterm下载地址（页面最后的Asset的windows安装包，先检查自己是32位系统64位系统，再选择要下载的安装包）:** https://github.com/kingToolbox/WindTerm/releases/tag/2.6.0
 * **宝塔面板安装命令:** ：
   Ubuntu/Deepin安装命令：
