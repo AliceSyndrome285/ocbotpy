@@ -1,3 +1,6 @@
+## 更新日志
+20250126：调整了记忆应用中总结功能和永久记忆功能的代码，并更新Dify中的记忆应用以适配
+
 ## xhs教程相关
 * **Windterm下载地址（页面最后的Asset的windows安装包，先检查自己是32位系统64位系统，再选择要下载的安装包）:** https://github.com/kingToolbox/WindTerm/releases/tag/2.6.0
 * **宝塔面板安装命令:** https://bt.cn/bbs/thread-19376-1-1.html
