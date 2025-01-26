@@ -5,7 +5,7 @@
 * **Windterm下载地址（页面最后的Asset的windows安装包，先检查自己是32位系统64位系统，再选择要下载的安装包）:** https://github.com/kingToolbox/WindTerm/releases/tag/2.6.0
 * **宝塔面板安装命令:** https://bt.cn/bbs/thread-19376-1-1.html
 * **终端安装依赖的命令:** /www/server/pyporject_evn/examples_venv/bin/python -m pip install -r /www/server/pyporject_evn/examples_venv/requirements.txt
-* **OCworkshop和记忆应用:** 群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限oc创作者入群，见谅
+* **OCworkshop和记忆应用:** 本项目需要导入Dify应用：memory.dsl和ocworkshop.dsl的情况下使用，群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限AI聊天爱好者，oc爱好者和创作者入群，见谅
 
 * 
 # QQ群聊机器人
