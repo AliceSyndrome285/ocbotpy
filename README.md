@@ -4,7 +4,7 @@
 2.更新gif2base64.py，将图片转为base64格式并写入emotion_config中，实现根据聊天内容匹配角色表情包
 
 # 使用方法
-在code中下载压缩包，解压后的ocbotpy文件夹就是xhs教程中所需的文件夹
+在code中Download ZIP下载压缩包，解压后的ocbotpy文件夹就是xhs教程中所需的文件夹
 
 # xhs教程相关（账号：末期少女病）
 * **教程更正＆补充:** ：
