@@ -7,7 +7,7 @@
 * **Windterm下载地址（页面最后的Asset的windows安装包，先检查自己是32位系统64位系统，再选择要下载的安装包）:** https://github.com/kingToolbox/WindTerm/releases/tag/2.6.0
 * **宝塔面板安装命令:** https://bt.cn/bbs/thread-19376-1-1.html
 * **终端安装依赖的命令:** /www/server/pyporject_evn/examples_venv/bin/python -m pip install -r /www/server/pyporject_evn/examples_venv/requirements.txt
-* **OCworkshop和记忆应用:** 本项目需要导入Dify应用：memory.dsl和ocworkshop.dsl的情况下使用，群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限AI聊天爱好者，oc爱好者和创作者入群，见谅
+* **OCworkshop和记忆应用:** 本项目需要导入Dify应用：memory.yml和OCworkshop.yml的情况下使用，群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限AI聊天爱好者，oc爱好者和创作者入群，见谅
 
 * 
 # 项目介绍
@@ -19,50 +19,43 @@
 
 * **智能对话:** 通过 接入Dify API 实现智能对话，根据用户的问题提供相应的答案。
 * **记忆和总结:**  将对话历史记录发送到一个独立的记忆处理应用，并定期对对话内容进行总结，发送给 Dify API，帮助维持上下文和提升对话连贯性。
-* **语音合成:**  使用 Azure 语音合成服务将机器人的回复转换为语音，并以 SILK 格式发送到群聊中 (需要配置 Azure 语音服务)。
+* **语音合成:**  使用 Azure 语音合成服务将机器人的回复转换为语音，并以 SILK 格式发送到群聊中 (需要配置 Azure 语音服务的speech_key和speech_region)。
 * **情绪图片:** 支持配置情绪词典，将消息中的情绪词替换为对应的图片。
 
 ## 架构
 
 该机器人主要由以下几个部分组成：
 
-* **BotPY 客户端:** 负责接收群消息、@机器人消息，并调用 Dify API 获取回复。
-* **Dify API:** 提供智能对话的核心功能。
-* **记忆处理应用:** 接收对话历史记录，并定期生成总结。
+* **BotPY 客户端:** 负责接收群消息，并调用 Dify API 获取回复。
+* **Dify API:** 接入在线大模型生成聊天内容，总结聊天记忆，向知识库写入永久记忆
 * **Azure 语音合成服务 (可选):** 将文本转换为语音。
-
-## 安装
-
-1.  **克隆仓库:** `git clone https://github.com/your-username/your-repo-name.git`
-2.  **安装依赖:** `pip install -r requirements.txt`
-3.  **配置:**
-    *   复制 `config.yaml.example` 并重命名为 `config.yaml`，填写你的 AppID、AppSecret、API Key 等配置信息。
-    *   复制 `emotion_config.yaml.example` 并重命名为 `emotion_config.yaml`，配置情绪词和对应的 base64 图片字符串。
+* **表情包发送:** 根据聊天内容匹配角色表情包
 
 ## 使用
 
 1.  运行 `python test.py` 启动机器人。
 2.  在 QQ 群中 @机器人，即可与其进行对话。
-3.  在消息中添加 `-v` 可以触发语音回复功能 (需要配置 Azure 语音服务)。
+3.  在消息中添加 `-v` 可以触发语音回复功能 (需要配置 Azure 语音服务的speech_key和speech_region)。
+4.  在examples文件夹上传自己的表情包，命名格式类似：[高兴].png，并且在Dify-OCworkshop中作相应的提示词要求，机器人即可在回复时输出表情包。
 
 ## 配置
 
 ### `config.yaml`
 
-*   `appid`: 你的机器人 AppID。
-*   `secret`: 你的机器人 AppSecret。
-*   `api_url`: Workshop API 的 URL。
-*   `api_key`: Workshop API 的 Key。
-*   `memory_api_url`: 记忆处理应用的 API URL。
-*   `memory_api_key`: 记忆处理应用的 API Key。
-*   `speech_key`: Azure 语音服务的 Key (可选)。
-*   `speech_region`: Azure 语音服务的区域 (可选)。
-*   `xml_lang`: SSML 的语言，默认为 `zh-CN`。
-*   `voice_name`:  语音名称，默认为 `zh-CN-XiaochenNeural`。
-*   `style`:  语音风格，默认为 `live_commercial`。
-*   `style_degree`: 语音风格程度，默认为 `2`。
-
-
+*   `appid`: `你的机器人 AppID`
+*   `secret`: 你的机器人 AppSecret
+*   `api_url`: Workshop API 的 URL
+*   `api_key`: Workshop API 的 Key
+*   `memory_api_url`: 记忆处理应用的 API URL
+*   `memory_api_key`: 记忆处理应用的 API Key
+*   `dataset_base_url`: 知识库API的 URL
+*   `dataset_api_key`: 知识库API 的 Key
+*   `speech_key`: Azure 语音服务的 Key (可选)
+*   `speech_region`: Azure 语音服务的区域 (可选)
+*   `xml_lang`: SSML 的语言
+*   `voice_name`:  语音名称
+*   `style`:  语音风格
+*   `style_degree`: 语音风格程度
 
 ### `emotion_config.yaml`
 
