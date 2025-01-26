@@ -1,14 +1,19 @@
 ## 更新日志
 20250126：调整了记忆应用中总结功能和永久记忆功能的代码，并更新Dify中的记忆应用以适配
+## 使用方法：
+在code中下载压缩包，解压后的ocbotpy文件夹就是xhs教程中所需的文件夹
 
-## xhs教程相关
+## xhs教程相关（账号：末期少女病）
 * **Windterm下载地址（页面最后的Asset的windows安装包，先检查自己是32位系统64位系统，再选择要下载的安装包）:** https://github.com/kingToolbox/WindTerm/releases/tag/2.6.0
 * **宝塔面板安装命令:** https://bt.cn/bbs/thread-19376-1-1.html
 * **终端安装依赖的命令:** /www/server/pyporject_evn/examples_venv/bin/python -m pip install -r /www/server/pyporject_evn/examples_venv/requirements.txt
 * **OCworkshop和记忆应用:** 本项目需要导入Dify应用：memory.dsl和ocworkshop.dsl的情况下使用，群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限AI聊天爱好者，oc爱好者和创作者入群，见谅
 
 * 
-# QQ群聊机器人
+## 更新日志
+
+## 项目介绍
+# QQ群聊AI+基于Dify工作流的AI角色创作＆永久记忆
 
 这个项目是一个基于 BotPY 和 Python 的 QQ 群聊机器人，集成了 Dify API、记忆处理应用和 Azure 语音合成服务，提供智能对话、记忆总结和语音回复等功能。
 
