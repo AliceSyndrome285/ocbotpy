@@ -63,15 +63,15 @@ def update_config_with_base64(config_path):
             config["emotion_mapping"][emotion_key] = base64_string
             print(f"已将 {gif_file} 转换为 base64 并添加到 emotion_mapping。")
 
-    # 将更新后的配置写回 config.yaml
+    # 将更新后的配置写回 emotion_config.yaml
     try:
         with open(config_path, "w", encoding="utf-8") as f:
             yaml.dump(config, f, allow_unicode=True)  # 使用 yaml.dump 写入文件
-        print("config.yaml 文件已更新。")
+        print("emotion_config.yaml 文件已更新。")
     except Exception as e:
-        print(f"写入 config.yaml 文件时发生错误: {e}")
+        print(f"写入 emotion_config.yaml 文件时发生错误: {e}")
 
 if __name__ == "__main__":
-    # 获取 config.yaml 的路径
-    config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
+    # 获取 emotion_config.yaml.yaml 的路径
+    config_path = os.path.join(os.path.dirname(__file__), "emotion_config.yaml")
     update_config_with_base64(config_path)
