@@ -9,7 +9,7 @@ import botpy
 from botpy import logging
 from botpy.message import GroupMessage
 from botpy.ext.cog_yaml import read
-import requests
+import aiohttp # 使用 aiohttp 替代 requests
 import numpy
 import re
 import asyncio
@@ -90,7 +90,7 @@ def write_conversation_data(filename, conversation_id, count):
         json.dump(data, f, indent=4)
 
 async def call_api(query):
-    global conversation_turn_counter  # 保留全局变量以进行其他用途的计数，例如日志记录
+    global conversation_turn_counter
     conversation_id, current_count = read_conversation_data(API_CONVERSATION_ID_FILE)
 
     data = {
@@ -100,28 +100,27 @@ async def call_api(query):
         "conversation_id": conversation_id,
         "user": "admin",
     }
-    async with api_call_lock:
-        response = requests.post(API_URL, json=data, headers=API_HEADERS)
 
-        print(f"Received response: {response.status_code} - {response.text}")
+    async with aiohttp.ClientSession() as session:
+        async with session.post(API_URL, json=data, headers=API_HEADERS) as response:
+            print(f"Received response: {response.status} - {await response.text()}")
 
-        if response.status_code == 200:
-            response_json = response.json()
-            answer = response_json.get('answer', '没有返回数据')
+            if response.status == 200:
+                response_json = await response.json()
+                answer = response_json.get('answer', '没有返回数据')
 
-            # 如果发送的 conversation_id 为空，则获取新的 conversation_id 并保存
-            if not conversation_id:
-                new_conversation_id = response_json.get("conversation_id")
-                if new_conversation_id:
-                    # 写入新 conversation_id 和初始计数 1
-                    write_conversation_data(API_CONVERSATION_ID_FILE, new_conversation_id, 1)
-                    print(f"New conversation_id for API saved: {new_conversation_id}, count initialized to 1")
-                    conversation_id = new_conversation_id
-            conversation_turn_counter = current_count
-            return answer
-        else:
-            print(f"API请求失败，状态码：{response.status_code}")
-            return "抱歉，服务暂时不可用"
+                if not conversation_id:
+                    new_conversation_id = response_json.get("conversation_id")
+                    if new_conversation_id:
+                        write_conversation_data(API_CONVERSATION_ID_FILE, new_conversation_id, 1)
+                        print(f"New conversation_id for API saved: {new_conversation_id}, count initialized to 1")
+                        conversation_id = new_conversation_id
+                conversation_turn_counter = current_count
+                return answer
+            else:
+                print(f"API请求失败，状态码：{response.status}")
+                return "抱歉，服务暂时不可用"
+
 async def call_memory_api(query, answer=None):
     global conversation_turn_counter
 
@@ -140,102 +139,69 @@ async def call_memory_api(query, answer=None):
         "user": "bot",
     }
 
-    loop = asyncio.get_event_loop()
-    future = loop.run_in_executor(None, lambda: requests.post(MEMORY_API_URL, json=data, headers=MEMORY_API_HEADERS))
-    response = await future
+    async with aiohttp.ClientSession() as session:
+        async with session.post(MEMORY_API_URL, json=data, headers=MEMORY_API_HEADERS) as response:
+            print(f"Memory API Received response: {response.status} - {await response.text()}")
 
-    print(f"Memory API Received response: {response.status_code} - {response.text}")
+            if response.status == 200:
+                response_json = await response.json()
+                memory_answer = response_json.get('answer', '没有返回数据')
 
-    if response.status_code == 200:
-        response_json = response.json()
-        memory_answer = response_json.get('answer', '没有返回数据')
+                if not conversation_id:
+                    new_conversation_id = response_json.get("conversation_id")
+                    if new_conversation_id:
+                        write_conversation_data(MEMORY_API_CONVERSATION_ID_FILE, new_conversation_id, 1)
+                        print(f"New conversation_id for Memory API saved: {new_conversation_id}, count initialized to 1")
+                        conversation_id = new_conversation_id
+                return memory_answer
+            else:
+                print(f"Memory API 请求失败，状态码：{response.status}")
+                return None
 
-        # 如果发送的 conversation_id 为空，则获取新的 conversation_id 并保存
-        if not conversation_id:
-            new_conversation_id = response_json.get("conversation_id")
-            if new_conversation_id:
-                # 写入新 conversation_id 和初始计数 1
-                write_conversation_data(MEMORY_API_CONVERSATION_ID_FILE, new_conversation_id, 1)
-                print(f"New conversation_id for Memory API saved: {new_conversation_id}, count initialized to 1")
-                conversation_id = new_conversation_id
-        return memory_answer
-    else:
-        print(f"Memory API 请求失败，状态码：{response.status_code}")
-        return None
-
-def search_databases(api_key, base_url):
+async def search_databases(api_key, base_url):
     """
     查询知识库列表，获取第一个 dataset 的 ID。
-
-    Args:
-      api_key: 你的 API 密钥。
-      base_url: API 的 base URL。
-
-    Returns:
-      第一个 dataset 的 ID，如果没有找到则返回 None。
     """
-    url = f"{base_url}/v1/datasets?page=1&limit=1"  # Limit to 1 to get only the first dataset
-    headers = {
-        "Authorization": f"Bearer {api_key}"
-    }
+    url = f"{base_url}/v1/datasets?page=1&limit=1"
+    headers = {"Authorization": f"Bearer {api_key}"}
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    response_json = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            response.raise_for_status()
+            response_json = await response.json()
 
-    if response_json and response_json['data']:
-        dataset_id = response_json['data'][0]['id']
-        print(f"Found dataset ID: {dataset_id}")
-        return dataset_id
-    else:
-        print("No datasets found.")
-        return None
+            if response_json and response_json['data']:
+                dataset_id = response_json['data'][0]['id']
+                print(f"Found dataset ID: {dataset_id}")
+                return dataset_id
+            else:
+                print("No datasets found.")
+                return None
 
-def get_documents_in_dataset(api_key, base_url, dataset_id):
+async def get_documents_in_dataset(api_key, base_url, dataset_id):
     """
     查询指定知识库的文档列表，获取第一个 document 的 ID。
-
-    Args:
-      api_key: 你的 API 密钥。
-      base_url: API 的 base URL。
-      dataset_id: 知识库 ID。
-
-    Returns:
-      第一个 document 的 ID，如果没有找到则返回 None。
     """
-    url = f"{base_url}/v1/datasets/{dataset_id}/documents?page=1&limit=1"  # Limit to 1 to get only the first document
-    headers = {
-        "Authorization": f"Bearer {api_key}"
-    }
+    url = f"{base_url}/v1/datasets/{dataset_id}/documents?page=1&limit=1"
+    headers = {"Authorization": f"Bearer {api_key}"}
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    response_json = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            response.raise_for_status()
+            response_json = await response.json()
 
-    if response_json and response_json['data']:
-        document_id = response_json['data'][0]['id']
-        print(f"Found document ID: {document_id}")
-        return document_id
-    else:
-        print(f"No documents found in dataset {dataset_id}.")
-        return None
+            if response_json and response_json['data']:
+                document_id = response_json['data'][0]['id']
+                print(f"Found document ID: {document_id}")
+                return document_id
+            else:
+                print(f"No documents found in dataset {dataset_id}.")
+                return None
 
-def update_document_by_text(api_key, base_url, dataset_id, document_id, text):
+async def update_document_by_text(api_key, base_url, dataset_id, document_id, text):
     """
     通过文本更新知识库中的文档。
-
-    Args:
-      api_key: 你的 API 密钥。
-      base_url: API 的 base URL。
-      dataset_id: 知识库 ID。
-      document_id: 文档 ID。
-      text: 要更新的文本内容。
-      name: 文档名称 (可选，默认为 "rag_memory.txt")。
-
-    Returns:
-      API 响应的 JSON 对象。
     """
-
     url = f"{base_url}/v1/datasets/{dataset_id}/documents/{document_id}/segments"
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -244,35 +210,31 @@ def update_document_by_text(api_key, base_url, dataset_id, document_id, text):
     segments = [{"content": paragraph} for paragraph in text.split('\n')]
     data = {"segments": segments}
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    response.raise_for_status()
-
-    return response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, json=data) as response:
+            response.raise_for_status()
+            return await response.json()
 
 def parse_rag_memory(text):
     """
     解析 RAG 记忆构建智能体生成的文本，并去除 Dify 添加的单个转义符 \。
-    （这个函数在之前的回答中已经提供，无需修改）
-    """
+    （这个函数在之前的回答中已经提供，无需修改）    """
     # ... (省略代码，与之前回答中的 parse_rag_memory 函数相同) ...
     # 找到第一个 "type:" 的位置
     start_index = text.find("type:")
     if start_index == -1:
         return ""  # 如果没有找到 "type:"，则返回空字符串
-
     # 找到最后一个 "type:" 的位置
     last_type_index = text.rfind("type:")
 
     # 找到最后一个 "type:" 所在行的最后一个非 \ 字符的位置
     end_index = -1
-
     # 从最后一个 "type:" 所在位置开始向后查找
     for i in range(last_type_index, len(text)):
         # 遇到换行符或到达文本末尾，则停止查找
         if text[i] == '\n' or i == len(text) - 1:
             end_index = i
             break
-
     # 提取指定范围内的文本
     extracted_text = text[start_index:end_index + 1]
 
@@ -296,74 +258,60 @@ async def process_memory(query, answer):
     api_current_count += 1
     write_conversation_data(API_CONVERSATION_ID_FILE, api_conversation_id, api_current_count)
 
-
-
-    #  每次都将query 和 answer 发送到记忆处理应用
+    # 每次都将 query 和 answer 发送到记忆处理应用
     await call_memory_api(query, answer)
 
     if memory_current_count % 10 == 0:
-        # 检查是否已经请求过总结
         if os.path.exists(SUMMARY_REQUESTED_FLAG):
             print("总结请求已发送，不再重复发送")
             return
-        # 发送总结指令
+
         summary_response = await call_memory_api("【【开始总结】】")
         _log.info(f"收到总结请求的响应: {summary_response}")
 
         if summary_response:
-            # 使用锁来确保发送总结结果时，不会处理新的用户消息
-            async with api_call_lock:
-                # 使用 re.DOTALL 标志来匹配所有字符，包括换行符
-                parts = re.split(r"(【【.+?】】)", summary_response, flags=re.DOTALL)
-                _log.info(f"总结内容拆分结果: {parts}")
-                summary_content = ""
-                permanent_memory_content = ""
+            parts = re.split(r"(【【.+?】】)", summary_response, flags=re.DOTALL)
+            _log.info(f"总结内容拆分结果: {parts}")
+            summary_content = ""
+            permanent_memory_content = ""
+            for i in range(1, len(parts), 2):
+                if parts[i] == "【【总结】】":
+                    summary_content = parts[i] + parts[i+1].strip()
+                elif parts[i] == "【【永久记忆】】":
+                    permanent_memory_content = parts[i+1].strip()
 
-                # 遍历 parts，找到 "【【总结】】" 和 "【【永久记忆】】"
-                for i in range(1, len(parts), 2):
-                    if parts[i] == "【【总结】】":
-                        summary_content = (parts[i] + parts[i+1].strip())
-                    elif parts[i] == "【【永久记忆】】":
-                        permanent_memory_content = parts[i+1].strip()
+            summary_content = summary_content.strip()
+            print(f"summary_content 的长度: {len(summary_content)}, 内容是否为空: {not summary_content}")
 
-                # 去除 summary_content 首尾的空白字符
-                summary_content = summary_content.strip()
+            if summary_content:
+                _log.info(f"准备发送给 ocworkshop 的总结内容: {summary_content}")
+                await call_api(summary_content)  # 使用 await 等待 call_api 完成
+                print(f"已发送总结内容给 ocworkshop: {summary_content}")
 
-                # 打印 summary_content 的长度和是否为空
-                print(f"summary_content 的长度: {len(summary_content)}, 内容是否为空: {not summary_content}")
-
-                # 发送总结内容给 ocworkshop
-                if summary_content:
-                    _log.info(f"准备发送给 ocworkshop 的总结内容: {summary_content}")
-                    await call_api(summary_content)
-                    print(f"已发送总结内容给 ocworkshop: {summary_content}")
-
-                # 将永久记忆内容写入知识库
-                if permanent_memory_content:
-                    dataset_api_key = test_config.get("dataset_api_key")
-                    dataset_base_url = test_config.get("dataset_base_url")
-                    if dataset_api_key and dataset_base_url:
-                        parsed_memory = parse_rag_memory(permanent_memory_content)
-                        dataset_id = search_databases(dataset_api_key, dataset_base_url)
-                        if dataset_id:
-                            document_id = get_documents_in_dataset(dataset_api_key, dataset_base_url, dataset_id)
-                            if document_id:
-                                try:
-                                    response_json = update_document_by_text(dataset_api_key, dataset_base_url, dataset_id, document_id, parsed_memory)
-                                    print("API 响应:")
-                                    print(json.dumps(response_json, indent=2))
-                                except requests.exceptions.RequestException as e:
-                                    print(f"请求失败: {e}")
-                            else:
-                                print("获取文档 ID 失败")
+            if permanent_memory_content:
+                dataset_api_key = test_config.get("dataset_api_key")
+                dataset_base_url = test_config.get("dataset_base_url")
+                if dataset_api_key and dataset_base_url:
+                    parsed_memory = parse_rag_memory(permanent_memory_content)
+                    dataset_id = await search_databases(dataset_api_key, dataset_base_url)
+                    if dataset_id:
+                        document_id = await get_documents_in_dataset(dataset_api_key, dataset_base_url, dataset_id)
+                        if document_id:
+                            try:
+                                response_json = await update_document_by_text(dataset_api_key, dataset_base_url, dataset_id, document_id, parsed_memory)
+                                print("API 响应:")
+                                print(json.dumps(response_json, indent=2))
+                            except aiohttp.ClientError as e:
+                                print(f"请求失败: {e}")
                         else:
-                            print("获取知识库 ID 失败")
+                            print("获取文档 ID 失败")
                     else:
-                        print("未配置知识库 API 密钥或基础 URL")
+                        print("获取知识库 ID 失败")
+                else:
+                    print("未配置知识库 API 密钥或基础 URL")
 
-                # 标记已请求总结
-                with open(SUMMARY_REQUESTED_FLAG, "w") as f:
-                    f.write("requested")
+            with open(SUMMARY_REQUESTED_FLAG, "w") as f:
+                f.write("requested")
         else:
             print("获取总结内容失败")
 
@@ -521,6 +469,8 @@ async def upload_and_build_media_message(base64_str: str, message: GroupMessage)
         _log.error(f"上传媒体时发生异常: {e}")
         print(f"上传媒体时发生异常: {e}")
         return None
+
+
 class MyClient(botpy.Client):
     async def on_ready(self):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
@@ -531,13 +481,13 @@ class MyClient(botpy.Client):
             os.remove(SUMMARY_REQUESTED_FLAG)
         # 获取群消息的内容
         query = message.content
-        answer = await call_api(query)
-        if api_call_lock.locked():
-            print("正在处理总结，请稍后再试")
-            return
-        if answer:
-            # 异步处理记忆逻辑
-            asyncio.create_task(process_memory(query, answer))
+
+        # 在调用 process_memory 之前获取锁
+        async with api_call_lock:
+            answer = await call_api(query)
+            if answer:
+                # 异步处理记忆逻辑
+                asyncio.create_task(process_memory(query, answer))
         if answer:
             if "-v" in query:  # 检查 query 中是否包含 "-v"
                 # 将 answer 作为输入，合成语音并转换为 Base64
@@ -636,3 +586,6 @@ if __name__ == "__main__":
     intents = botpy.Intents(public_messages=True)
     client = MyClient(intents=intents)
     client.run(appid=test_config["appid"], secret=test_config["secret"])
+        # 其余代码保持不变
+        # ...
+    # 锁在 process_memory 执行完毕后自动释放
