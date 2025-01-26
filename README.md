@@ -9,16 +9,16 @@
 # xhs教程相关（账号：末期少女病）
 * **教程更正＆补充:** ：
 * 
-  1.更正：14分48秒，app_url和memory_url的开头不要改成https，http就行，config.yaml里面的所有url地址开头都是http
+  1.14分48秒，app_url和memory_url的开头不要改成https，http就行，config.yaml里面的所有url地址开头都是http
 
-  2.补充：在亚马逊服务器中务必配置好下面的端口，并设置好IP限制：
+  2.在亚马逊服务器中务必配置好下面的端口，并设置好IP限制：
   •    22 端口：应用程序 SSH, 协议 TCP, 端口号 22
   •    80 端口：应用程序 HTTP, 协议 TCP, 端口号 80
   •    443 端口：应用程序 HTTPS, 协议 TCP, 端口号 443
   •    8888 端口：应用程序自定义, 协议 TCP, 端口号 8888
   •    xxxxx 端口：应用程序自定义, 协议 TCP, 端口号 xxxxx (此端口号在宝塔面板安装完成后生成，请根据实际情况填写)
 
-  3.补充：在获得了memory和OCworkshop的url和api之后，去Dify首页-知识库中创建知识库-添加一个空txt文件-自动分段与清洗，等待文件处理完成，
+  3.在获得了memory和OCworkshop的url和api之后，去Dify首页-知识库中创建知识库-添加一个空txt文件-自动分段与清洗，等待文件处理完成，
   然后在记事本中补充：
   dataset_base_url: http://(你的服务器IP):8888 
   dataset_api_key:  (你的知识库apikey)
