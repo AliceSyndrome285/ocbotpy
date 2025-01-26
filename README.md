@@ -1,5 +1,6 @@
 # 更新日志
-20250126：调整了记忆应用中总结功能和永久记忆功能的代码，并更新Dify中的记忆应用以适配
+20250126：1.更新test.py，调整了记忆应用中总结功能和永久记忆功能的代码，并更新Dify中的记忆应用以适配。2.更新gif2base64.py，将图片转为base64格式并写入emotion_config中，实现根据聊天内容匹配角色表情包
+
 # 使用方法
 在code中下载压缩包，解压后的ocbotpy文件夹就是xhs教程中所需的文件夹
 
@@ -8,6 +9,7 @@
 * **宝塔面板安装命令:** ：
   Ubuntu/Deepin安装命令：wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && sudo bash install.sh
 * **宝塔面板终端-安装依赖命令:** /www/server/pyporject_evn/examples_venv/bin/python -m pip install -r /www/server/pyporject_evn/examples_venv/requirements.txt
+  examples_venv是宝塔面板创建的虚拟环境文件夹名称，根据创建python项目时输入的名称而定，教程中的项目名为examples。
 * **OCworkshop和记忆应用:** 本项目需要导入Dify应用：memory.yml和OCworkshop.yml的情况下使用，群文件获取，群：1017292082，帮忙迁移角色到QQAI，持续更新角色设定和好玩的应用，但只限AI聊天爱好者，oc爱好者和创作者入群，见谅
 
 * 
@@ -27,8 +29,8 @@
 
 该机器人主要由以下几个部分组成：
 
-* **BotPY 客户端:** 负责接收群消息，并调用 Dify API 获取回复。
-* **Dify API:** 接入在线大模型生成聊天内容，总结聊天记忆，向知识库写入永久记忆
+* **BotPY:** 负责接收群消息，并调用 Dify API 获取回复。
+* **Dify:** 接入在线大模型生成聊天内容，总结聊天记忆，向知识库写入永久记忆
 * **Azure 语音合成服务 (可选):** 将文本转换为语音。
 * **表情包发送:** 根据聊天内容匹配角色表情包
 
