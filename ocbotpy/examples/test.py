@@ -37,7 +37,12 @@ MEMORY_API_HEADERS = {
 }
 # MEMORY_CONVERSATION_ID = test_config.get("memory_conversation_id")  # 移除此行，不再从配置文件读取
 
-emotion_mapping = emotion_config.get("emotion_mapping", {})
+# Check if emotion_mapping exists, initialize to empty dict if not found
+emotion_mapping = emotion_config.get("emotion_mapping", {}) if emotion_config else {}
+if not emotion_mapping:
+    _log.warning("emotion_mapping not found in emotion_config. Emotion replacement will be disabled.")
+    print("emotion_mapping not found in emotion_config. Emotion replacement will be disabled.")
+
 # Azure 语音配置
 speech_key = test_config.get("speech_key")
 speech_region = test_config.get("speech_region")
@@ -272,53 +277,44 @@ async def synthesize_speech_to_silk_base64(text: str) -> str:
         return None
 def replace_emotion_with_base64(paragraph: str) -> list:
     """将段落中的情绪词替换为对应的 base64 图片"""
-    _log.info(f"开始处理段落: {paragraph}")
+    if not emotion_mapping:
+        # If emotion_mapping is empty, return the paragraph as is
+        return [("text", paragraph)]
+
     parts = []
     last_match_end = 0
     for emotion, base64_str in emotion_mapping.items():
-        _log.info(f"正在查找表情: {emotion}")
-        for match in re.finditer(re.escape(emotion), paragraph):
+        for match in re.finditer(re.escape(emotion), paragraph): # 确保匹配的是整个词，而不是部分，并使用 re.escape
             start, end = match.span()
-            _log.info(f"找到表情: {emotion}，位置: {start}-{end}")
 
             # 添加匹配之前的文本
             if start > last_match_end:
-                text_part = paragraph[last_match_end:start]
-                _log.info(f"添加文本部分: {text_part}")
-                parts.append(("text", text_part))
+                parts.append(("text", paragraph[last_match_end:start]))
 
             # 添加图片标签
-            _log.info(f"添加图片部分: {base64_str[:20]}... (Base64 编码前20个字符)")
             parts.append(("image", base64_str))
             last_match_end = end
 
     # 添加匹配后的剩余文本
     if last_match_end < len(paragraph):
-        text_part = paragraph[last_match_end:]
-        _log.info(f"添加剩余文本部分: {text_part}")
-        parts.append(("text", text_part))
+        parts.append(("text", paragraph[last_match_end:]))
 
-    _log.info(f"段落处理完成，共生成 {len(parts)} 部分")
     return parts
-
 
 async def upload_and_build_media_message(base64_str: str, message: GroupMessage):
     """上传图片并构建媒体消息"""
-    _log.info(f"开始上传图片: {base64_str[:20]}... (Base64 编码前20个字符)")
     try:
         uploadMedia = await message._api.post_group_file(
             group_openid=message.group_openid,
             file_type=1,  # 1 表示图片
             file_data=base64_str
         )
-        _log.info(f"图片上传响应: {uploadMedia}")
 
         file_uuid = uploadMedia.get('file_uuid')
         file_info = uploadMedia.get('file_info')
         ttl = uploadMedia.get('ttl')
 
         if file_uuid and file_info and ttl:
-            _log.info(f"图片上传成功: file_uuid={file_uuid}, file_info={file_info}, ttl={ttl}")
             return {
                 "file_uuid": file_uuid,
                 "file_info": file_info,
